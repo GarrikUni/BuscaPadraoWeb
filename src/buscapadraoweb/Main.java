@@ -36,7 +36,24 @@ public class Main {
         return -1;
     }
 
-    
+    // public static String normalizaHTML(String html) {
+    //     if (html == null) return null;
+
+    //     // Troca NBSP e outros espaços “exóticos” por espaço normal
+    //     String normalizado = html
+    //         .replace('\u00A0', ' ')   // NBSP
+    //         .replace('\u202F', ' ')   // Narrow NBSP
+    //         .replace('\u2009', ' ')   // Thin space
+    //         .replace('\u2007', ' ')   // Figure space
+    //         .replace('\t', ' ')       // tab
+    //         .replace('\n', ' ')       // quebra de linha
+    //         .replace('\r', ' ');      // carriage return
+
+    //     // Se quiser, colapsa múltiplos espaços em apenas um
+    //     normalizado = normalizado.replaceAll(" +", " ");
+
+    //     return normalizado;
+    // }
 
     //retorna o próximo estado, dado o estado atual e o símbolo lido
     public static int proximo_estado(char[] alfabeto, int[][] matriz,int estado_atual,char simbolo){
@@ -55,8 +72,12 @@ public class Main {
         //instancia e usa objeto que captura código-fonte de páginas Web
         CapturaRecursosWeb crw = new CapturaRecursosWeb();
         crw.getListaRecursos().add("https://learn.microsoft.com/pt-br/system-center/orchestrator/standard-activities/format-date-time?view=sc-orch-2025"); 
-        crw.getListaRecursos().add("https://www.ibm.com/docs/pt-br/cmofm/9.5.0?topic=SSEPCD_9.5.0/com.ibm.ondemand.mp.doc/arsa0257.html"); // Sites usados
-        crw.getListaRecursos().add("https://help.highbond.com/helpdocs/analytics/18/pt-br/Content/analytics/defining_importing_data/data_definition_wizard/formats_of_date_and_time_source_data.htm");
+        crw.getListaRecursos().add("https://help.highbond.com/helpdocs/analytics/18/pt-br/Content/analytics/defining_importing_data/data_definition_wizard/formats_of_date_and_time_source_data.htm"); 
+        crw.getListaRecursos().add("https://community.fabric.microsoft.com/t5/Desktop/Convert-DateTime-format-from-dd-mm-yyyy-hh-mm-ss-to-dd-mm-yyyy/m-p/705735"); 
+        crw.getListaRecursos().add("https://unix.stackexchange.com/questions/45926/display-time-stamp-in-dd-mm-yyyy-hhmmssms-in-unix-or-linux");
+        crw.getListaRecursos().add("https://stackoverflow.com/questions/8745297/want-current-date-and-time-in-dd-mm-yyyy-hhmmss-ss-format");
+        crw.getListaRecursos().add("https://momentjs.com/docs/");
+        
         ArrayList<String> listaCodigos = crw.carregarRecursos();
 
         // String codigoHTML = listaCodigos.get(0);
@@ -371,6 +392,9 @@ public class Main {
         
         for (int idx = 0; idx < listaCodigos.size(); idx++) {
             String codigoHTML = listaCodigos.get(idx);
+            // codigoHTML = normalizaHTML(codigoHTML);
+            codigoHTML = codigoHTML.replace("&#160;", " ");
+
             System.out.println("=== Processando site #" + (idx+1) + " ===");
 
             int estado = get_string_ref (estados, estado_inicial);
@@ -405,8 +429,18 @@ public class Main {
                 }else{
                     //se houver transição válida, adiciona caracter a palavra
                     palavra += codigoHTML.charAt(i);
+                    // if(palavra.length() > 9){
+                    //     System.out.println(palavra);
+                    // } 
                 }
-            }
+            }       
+
+            // se o HTML terminar exatamente em um estado final adiciona a palavra
+            // if (get_string_ref(estados_finais, estados[estado]) != -1) {
+            //     if (!palavra.equals("")) {
+            //         palavras_reconhecidas.add(palavra);
+            //     }
+            // }  
 
 
             //foreach no Java para exibir todas as palavras reconhecidas
