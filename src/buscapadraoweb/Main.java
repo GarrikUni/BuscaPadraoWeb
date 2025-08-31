@@ -55,11 +55,11 @@ public class Main {
         //instancia e usa objeto que captura código-fonte de páginas Web
         CapturaRecursosWeb crw = new CapturaRecursosWeb();
         crw.getListaRecursos().add("https://learn.microsoft.com/pt-br/system-center/orchestrator/standard-activities/format-date-time?view=sc-orch-2025"); 
-        // crw.getListaRecursos().add("https://www.ibm.com/docs/pt-br/cmofm/9.5.0?topic=SSEPCD_9.5.0/com.ibm.ondemand.mp.doc/arsa0257.html"); // Sites usados
-        // crw.getListaRecursos().add("https://help.highbond.com/helpdocs/analytics/18/pt-br/Content/analytics/defining_importing_data/data_definition_wizard/formats_of_date_and_time_source_data.htm");
+        crw.getListaRecursos().add("https://www.ibm.com/docs/pt-br/cmofm/9.5.0?topic=SSEPCD_9.5.0/com.ibm.ondemand.mp.doc/arsa0257.html"); // Sites usados
+        crw.getListaRecursos().add("https://help.highbond.com/helpdocs/analytics/18/pt-br/Content/analytics/defining_importing_data/data_definition_wizard/formats_of_date_and_time_source_data.htm");
         ArrayList<String> listaCodigos = crw.carregarRecursos();
 
-        String codigoHTML = listaCodigos.get(0);
+        // String codigoHTML = listaCodigos.get(0);
 
         //mapa do alfabeto
         char[] alfabeto = new char[13];
@@ -369,45 +369,50 @@ public class Main {
         matriz[get_string_ref(estados, "q22")][get_char_ref(alfabeto, ' ')] = -1;
 
         
-        int estado = get_string_ref (estados, estado_inicial);
-        int estado_anterior = -1;
-        ArrayList<String> palavras_reconhecidas = new ArrayList();
+        for (int idx = 0; idx < listaCodigos.size(); idx++) {
+            String codigoHTML = listaCodigos.get(idx);
+            System.out.println("=== Processando site #" + (idx+1) + " ===");
+
+            int estado = get_string_ref (estados, estado_inicial);
+            int estado_anterior = -1;
+            ArrayList<String> palavras_reconhecidas = new ArrayList();
 
 
-        String palavra = "";
+            String palavra = "";
 
-        //varre o código-fonte de um código
-        for (int i=0; i<codigoHTML.length(); i++){
+            //varre o código-fonte de um código
+            for (int i=0; i<codigoHTML.length(); i++){
 
-            estado_anterior = estado;
-            estado = proximo_estado(alfabeto, matriz, estado, codigoHTML.charAt(i));
-            //se o não há transição
-            if (estado == -1){
-                //pega estado inicial
-                estado = get_string_ref(estados, estado_inicial);
-                // se o estado anterior foi um estado final
-                if (get_string_ref(estados_finais, estados[estado_anterior]) != -1){
-                    //se a palavra não é vazia adiciona palavra reconhecida
-                    if ( ! palavra.equals("")){
-                        palavras_reconhecidas.add(palavra);
+                estado_anterior = estado;
+                estado = proximo_estado(alfabeto, matriz, estado, codigoHTML.charAt(i));
+                //se o não há transição
+                if (estado == -1){
+                    //pega estado inicial
+                    estado = get_string_ref(estados, estado_inicial);
+                    // se o estado anterior foi um estado final
+                    if (get_string_ref(estados_finais, estados[estado_anterior]) != -1){
+                        //se a palavra não é vazia adiciona palavra reconhecida
+                        if ( ! palavra.equals("")){
+                            palavras_reconhecidas.add(palavra);
+                        }
+                        // se ao analisar este caracter não houve transição
+                        // teste-o novamente, considerando que o estado seja inicial
+                        i--;
                     }
-                    // se ao analisar este caracter não houve transição
-                    // teste-o novamente, considerando que o estado seja inicial
-                    i--;
+                    //zera palavra
+                    palavra = "";
+                    
+                }else{
+                    //se houver transição válida, adiciona caracter a palavra
+                    palavra += codigoHTML.charAt(i);
                 }
-                //zera palavra
-                palavra = "";
-                
-            }else{
-                //se houver transição válida, adiciona caracter a palavra
-                palavra += codigoHTML.charAt(i);
             }
-        }
 
 
-        //foreach no Java para exibir todas as palavras reconhecidas
-        for (String p: palavras_reconhecidas){
-            System.out.println (p);
+            //foreach no Java para exibir todas as palavras reconhecidas
+            for (String p: palavras_reconhecidas){
+                System.out.println (p);
+            }
         }
 
 
